@@ -258,7 +258,7 @@ export default function App() {
   const handleLoadSession = (session: ChatSession) => {
     setMessages(session.messages);
     setCurrentMode(session.mode);
-    addToast('info', 'Log Retrieved', `Session \"${session.title}\" loaded from archives.`);
+    addToast('info', 'Log Retrieved', `Session "${session.title}" loaded from archives.`);
   };
 
   const handleDeleteSession = (id: string) => {
@@ -333,7 +333,7 @@ export default function App() {
     
     // Append attached file content if present
     if (attachedFile && !overrideText) {
-        textToSend = `${textToSend}\\n\\n[FILE: ${attachedFile.name}]\\n${attachedFile.content}\\n[END FILE]`;
+        textToSend = `${textToSend}\n\n[FILE: ${attachedFile.name}]\n${attachedFile.content}\n[END FILE]`;
     }
     
     if ((!textToSend.trim() && !imageToSend) || isLoading) return;
@@ -424,7 +424,7 @@ export default function App() {
         ...existingMsg,
         text: editText,
         // We preserve the original timestamp or update it? 
-        // Updating it signifies a new \"branch\" of conversation.
+        // Updating it signifies a new "branch" of conversation.
         timestamp: Date.now() 
     };
 
@@ -639,4 +639,400 @@ export default function App() {
       <main className="flex-1 flex flex-col relative bg-slate-50/50 dark:bg-[#020617] dark:bg-[radial-gradient(#1e293b_1px,transparent_1px)] dark:[background-size:24px_24px] min-w-0">
       
       {/* Top Bar - Dynamic */}
-[TRUNCATED]
+      <div className={`h-16 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 bg-white/80 dark:bg-[#020617]/90 backdrop-blur-md sticky top-0 z-10 transition-colors`}>
+        <div className="flex items-center gap-3">
+          {/* Mobile Menu Trigger */}
+          <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden p-1.5 -ml-2 text-slate-500 hover:text-slate-800 dark:hover:text-white rounded-md"
+          >
+              <Menu className="w-5 h-5" />
+          </button>
+          
+          <div className={`w-1.5 h-1.5 rounded-full ${isLoading ? `bg-${activeConfig.color}-500 animate-ping` : 'bg-slate-400 dark:bg-slate-500'}`}></div>
+          <span className="text-xs font-mono text-slate-500 dark:text-slate-400 uppercase tracking-widest hidden sm:inline-block">
+            {isLoading ? 'PROCESSING STREAM...' : 'SYSTEM IDLE'}
+          </span>
+          <span className="text-xs font-mono text-slate-500 dark:text-slate-400 uppercase tracking-widest sm:hidden">
+            {isLoading ? 'BUSY' : 'IDLE'}
+          </span>
+        </div>
+        <div className={`flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-xs font-mono transition-colors duration-300`}>
+           <ShieldCheck className={`w-3 h-3 ${iconColor}`} />
+           <span className="text-slate-600 dark:text-slate-300 uppercase">{activeConfig.title} <span className="hidden sm:inline">PROTOCOL</span></span>
+        </div>
+      </div>
+
+      {/* Chat Area */}
+      <div className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar">
+        {messages.length === 0 ? (
+          <div className="min-h-full flex flex-col items-center justify-start md:justify-center p-4 pt-8 md:pt-4 pb-40">
+            <ModeIntro 
+              mode={currentMode} 
+              config={activeConfig} 
+              onQuickAction={(text) => setInputText(text)} 
+            />
+          </div>
+        ) : (
+          <div className="max-w-5xl mx-auto w-full pb-48 pt-8 px-4">
+             {messages.map((msg, index) => (
+                msg.role === 'user' ? (
+                  <div key={msg.id} className="flex flex-col items-end py-4 animate-fade-in-up group/user-msg">
+                    <div className="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 p-4 rounded-sm border border-slate-200 dark:border-transparent border-r-2 border-r-slate-400 dark:border-r-transparent max-w-[70%]">
+                      {editingMessageId === msg.id ? (
+                        // Edit Mode
+                        <div className="w-full flex flex-col gap-2">
+                           <textarea 
+                              value={editText}
+                              onChange={(e) => setEditText(e.target.value)}
+                              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded p-2 text-sm font-mono focus:ring-2 focus:ring-emerald-500 outline-none"
+                              rows={Math.max(3, editText.split('\n').length)}
+                           />
+                           <div className="flex items-center justify-end gap-2">
+                              <button 
+                                onClick={handleCancelEdit}
+                                className="px-3 py-1 text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded text-slate-600 dark:text-slate-300 transition-colors"
+                              >
+                                Cancel
+                              </button>
+                              <button 
+                                onClick={() => handleSaveEdit(msg.id)}
+                                className="px-3 py-1 text-xs bg-emerald-600 hover:bg-emerald-500 text-white rounded flex items-center gap-1 transition-colors"
+                              >
+                                <Check className="w-3 h-3" /> Save & Regenerate
+                              </button>
+                           </div>
+                        </div>
+                      ) : (
+                        // View Mode
+                        <>
+                          {msg.image && (
+                            <div className="mb-3 border border-slate-200 dark:border-slate-600">
+                              <img src={msg.image} alt="Upload" className="max-h-64 object-cover" />
+                            </div>
+                          )}
+                          <p className="whitespace-pre-wrap text-sm font-light leading-relaxed">{msg.text}</p>
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Action Bar */}
+                    <div className="flex items-center gap-2 mt-1 mr-1">
+                         <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">USER_ID_8492</span>
+                         <div className="flex items-center opacity-0 group-hover/user-msg:opacity-100 transition-opacity">
+                            <button 
+                              onClick={() => handleStartEdit(msg)}
+                              disabled={editingMessageId !== null}
+                              className="text-slate-400 hover:text-sky-500 dark:text-slate-600 dark:hover:text-sky-400 p-1 transition-colors disabled:opacity-50"
+                              title="Edit & Regenerate"
+                            >
+                              <Pencil className="w-3 h-3" />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteRequest(msg.id)}
+                              disabled={editingMessageId !== null}
+                              className="text-slate-400 hover:text-red-500 dark:text-slate-600 dark:hover:text-red-400 p-1 transition-colors disabled:opacity-50"
+                              title="Delete Message"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                         </div>
+                    </div>
+                  </div>
+                ) : msg.isThinking ? (
+                  <div key={msg.id} className={`py-6 flex gap-5 pl-6 animate-in fade-in slide-in-from-left-4 duration-500 border-l-2 border-${activeConfig.color}-500/20`}>
+                    {/* Avatar Area */}
+                    <div className="relative w-10 h-10 flex-shrink-0 flex items-center justify-center">
+                      <div className={`relative z-10 w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-${activeConfig.color}-500/40 flex items-center justify-center shadow-lg`}>
+                         <BrainCircuit className={`w-4 h-4 text-${activeConfig.color}-600 dark:text-${activeConfig.color}-400 ${currentMode === AppMode.DEEP_REASON ? 'animate-pulse' : ''}`} />
+                      </div>
+                    </div>
+                    
+                    {/* Text/Status Area */}
+                    <div className="flex flex-col justify-center gap-2">
+                      <div className="flex items-center gap-2">
+                         <span className={`text-xs font-mono font-bold text-${activeConfig.color}-600 dark:text-${activeConfig.color}-400 tracking-widest`}>
+                           {currentMode === AppMode.DEEP_REASON ? 'NEURAL_ENGINE_SYNTHESIS' : 'ANALYZING_INPUT'}
+                         </span>
+                         <div className="flex gap-1">
+                            <span className={`w-1 h-1 bg-${activeConfig.color}-500 rounded-full animate-bounce`}></span>
+                            <span className={`w-1 h-1 bg-${activeConfig.color}-500 rounded-full animate-bounce [animation-delay:150ms]`}></span>
+                            <span className={`w-1 h-1 bg-${activeConfig.color}-500 rounded-full animate-bounce [animation-delay:300ms]`}></span>
+                         </div>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="space-y-1">
+                         <div className={`h-1 w-48 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden`}>
+                            <div className={`h-full bg-${activeConfig.color}-500/80 rounded-full w-full origin-left animate-pulse`}></div>
+                         </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <BotMessage 
+                    key={msg.id} 
+                    message={msg} 
+                    hasImageContext={index > 0 && messages[index - 1].role === 'user' && !!messages[index - 1].image}
+                    onViewLogs={(m) => setSelectedLogMessage(m)}
+                    onViewReport={(m) => setSelectedReportMessage(m)}
+                    onArchive={handleArchive}
+                    onDelete={(m) => handleDeleteRequest(m.id)}
+                    onVisualRecon={handleVisualRecon}
+                    onVisualize={handleVisualize}
+                    theme={theme}
+                    isLatest={index === messages.length - 1}
+                  />
+                )
+             ))}
+             <div ref={messagesEndRef} />
+          </div>
+        )}
+      </div>
+
+      {/* Input Area */}
+      <div className="absolute bottom-0 left-0 right-0 p-3 md:p-6 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent dark:from-[#020617] dark:via-[#020617] z-20">
+        <div 
+          className="max-w-5xl mx-auto w-full relative"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+           {/* Market Context Badge - Only in Valuation Mode */}
+           {currentMode === AppMode.MARKET_VALUATION && (
+               <div className="absolute bottom-full mb-2 md:mb-3 right-0 md:right-auto md:left-0 flex animate-in slide-in-from-bottom-2">
+                   <div className="flex items-center gap-1.5 md:gap-2 px-2 py-1 md:px-3 md:py-1.5 bg-lime-500/10 border border-lime-500/30 rounded-md backdrop-blur-md shadow-lg">
+                      <MapPin className="w-3 md:w-3.5 h-3 md:h-3.5 text-lime-600 dark:text-lime-500" />
+                      <span className="text-[9px] md:text-[10px] font-mono font-bold text-lime-700 dark:text-lime-400 tracking-wider">Context: {countryObj?.label} ({countryObj?.currency})</span>
+                   </div>
+               </div>
+           )}
+
+           {/* Drag Overlay */}
+           {isDragging && (
+               <div className="absolute -inset-6 bg-slate-900/95 border-2 border-dashed border-cyan-500/50 rounded-xl z-50 flex items-center justify-center backdrop-blur-md animate-in fade-in duration-300">
+                   <div className="flex flex-col items-center gap-4 p-8 pointer-events-none">
+                       <div className="p-4 bg-cyan-500/10 rounded-full animate-bounce">
+                           <ImageIcon className="w-10 h-10 text-cyan-400" />
+                       </div>
+                       <div className="text-center">
+                           <p className="text-cyan-400 font-bold font-mono tracking-widest text-lg">DROP VISUAL DATA</p>
+                           <p className="text-cyan-500/50 text-xs font-mono mt-1">INITIATING UPLOAD PROTOCOL</p>
+                       </div>
+                   </div>
+               </div>
+           )}
+           
+           {/* Unified Preview Container */}
+           <div className="absolute bottom-full left-0 w-full mb-2 px-0 flex flex-col gap-2 pointer-events-none">
+               {/* File Preview */}
+               {attachedFile && (
+                   <div className="pointer-events-auto self-start ml-0 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl flex items-center gap-3 animate-in fade-in duration-300">
+                        <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded">
+                           <FileText className="w-5 h-5 text-slate-500" />
+                       </div>
+                       <div className="flex flex-col gap-0.5">
+                           <span className="text-xs font-bold text-slate-700 dark:text-slate-200 max-w-[200px] truncate">{attachedFile.name}</span>
+                           <span className="text-[9px] text-slate-500 font-mono">READY_TO_UPLOAD</span>
+                       </div>
+                       <button onClick={() => setAttachedFile(null)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 hover:text-red-500 transition-colors ml-auto">
+                           <X className="w-4 h-4" />
+                       </button>
+                   </div>
+               )}
+               
+               {/* Image Preview */}
+               {selectedImage && (
+                 <div className="pointer-events-auto self-start ml-0 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl flex items-center gap-4 animate-in fade-in duration-300">
+                   <div className="relative group/img">
+                       <img src={selectedImage} alt="Preview" className="h-16 w-16 object-cover border border-slate-200 dark:border-slate-600 rounded-sm" />
+                       <div className="absolute inset-0 bg-black/20 group-hover/img:bg-transparent transition-colors" />
+                   </div>
+                   <div className="flex flex-col gap-1.5">
+                     <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono tracking-wider flex items-center gap-2">
+                       <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                       IMAGE_BUFFER_READY
+                     </div>
+                     <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => {
+                            const prompt = inputText.trim() || "Conduct a detailed visual inspection of this image. Identify defects, severity, and recommend actions.";
+                            setCurrentMode(AppMode.IMAGE_EDIT); 
+                            handleSubmit(undefined, prompt, AppMode.IMAGE_EDIT);
+                          }}
+                          className="flex items-center gap-1.5 px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/50 rounded text-[10px] text-amber-600 dark:text-amber-400"
+                        >
+                           <ScanEye className="w-3 h-3" />
+                           Visual Recon
+                        </button>
+                        <button 
+                          onClick={() => setSelectedImage(null)}
+                          className="text-[10px] text-slate-500 hover:text-red-500 transition-colors uppercase font-mono"
+                        >
+                          Discard
+                        </button>
+                      </div>
+                   </div>
+                 </div>
+               )}
+           </div>
+           
+           <form onSubmit={(e) => handleSubmit(e)} className="relative group">
+             <div className={`relative flex items-stretch gap-0 bg-white dark:bg-[#0b1120] border border-slate-300 dark:border-slate-700 shadow-2xl transition-all rounded-lg overflow-hidden ${focusRing}`}>
+               <div className={`flex items-center justify-center border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 ${currentMode === AppMode.MARKET_VALUATION ? 'px-3 md:px-4' : 'px-2'}`}>
+                   {currentMode === AppMode.MARKET_VALUATION ? (
+                      <div className="flex items-center gap-3">
+                          {/* Existing Country Selector */}
+                          <div className="relative flex items-center gap-2 cursor-pointer group/country py-1 hover:bg-lime-500/10 rounded-md transition-all" title="Change Target Market">
+                               <MapPin className="w-3.5 h-3.5 text-lime-600 dark:text-lime-500" />
+                               <span className="text-[10px] font-bold text-lime-700 dark:text-lime-400 font-mono tracking-wider">{selectedCountryCode}</span>
+                               <ChevronDown className="w-3 h-3 text-lime-400 opacity-50 group-hover/country:opacity-100" />
+                                
+                               {/* Native Select Overlay */}
+                               <select 
+                                 value={selectedCountryCode}
+                                 onChange={(e) => setSelectedCountryCode(e.target.value)}
+                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                               >
+                                  {COUNTRY_OPTIONS.map(c => (
+                                    <option key={c.code} value={c.code}>{c.label} ({c.currency})</option>
+                                  ))}
+                               </select>
+                          </div>
+                          
+                          {/* Separator */}
+                          <div className="w-px h-4 bg-slate-300 dark:bg-slate-700"></div>
+
+                          {/* File Upload for Valuation */}
+                           <button
+                               type="button"
+                               onClick={() => docInputRef.current?.click()}
+                               className="text-slate-400 hover:text-lime-600 dark:hover:text-lime-400 transition-colors"
+                               title="Attach File"
+                           >
+                               <Paperclip className="w-3.5 h-3.5" />
+                           </button>
+                      </div>
+                   ) : (
+                      <button
+                       type="button"
+                       onClick={() => docInputRef.current?.click()}
+                       className="w-full h-full flex items-center justify-center text-slate-400 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors bg-slate-50/50 dark:bg-slate-900/20"
+                       title="Attach File"
+                     >
+                       <Paperclip className="w-4 h-4" />
+                     </button>
+                   )}
+               </div>
+
+               <input ref={docInputRef} type="file" className="hidden" onChange={handleDocUpload} />
+
+               <textarea
+                 value={inputText}
+                 onChange={(e) => setInputText(e.target.value)}
+                 onKeyDown={(e) => {
+                   if (e.key === 'Enter' && !e.shiftKey) {
+                     e.preventDefault();
+                     handleSubmit();
+                   }
+                 }}
+                 placeholder={currentMode === AppMode.MARKET_VALUATION ? `Valuation Request for ${countryObj?.label}...` : activeConfig.placeholder}
+                 className="flex-1 bg-transparent border-0 focus:ring-0 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 py-3 md:py-3.5 min-h-[50px] max-h-[150px] resize-none pr-2"
+                 rows={1}
+               />
+               
+               <button
+                 type="button"
+                 onClick={() => fileInputRef.current?.click()}
+                 className={`w-12 md:w-14 flex items-center justify-center text-slate-400 hover:text-${activeConfig.color}-600 dark:hover:text-${activeConfig.color}-400 transition-colors border-l border-slate-200 dark:border-slate-800`}
+                 title="Upload Image"
+               >
+                 <ImageIcon className="w-4 h-4" />
+               </button>
+               <input 
+                 ref={fileInputRef}
+                 type="file" 
+                 accept="image/*" 
+                 className="hidden" 
+                 onChange={handleImageUpload}
+               />
+               
+               <button
+                 type="submit"
+                 disabled={isLoading || (!inputText.trim() && !selectedImage && !attachedFile)}
+                 className={`w-12 md:w-14 flex items-center justify-center bg-slate-100 hover:bg-${activeConfig.color}-100 dark:bg-slate-800 dark:hover:bg-${activeConfig.color}-900/50 text-slate-700 dark:text-slate-200 transition-colors`}
+               >
+                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+               </button>
+             </div>
+           </form>
+
+           {/* Footer */}
+           <div className="mt-2 md:mt-4 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-3 text-[9px] md:text-[10px] font-mono text-slate-500 dark:text-slate-600">
+               <div className="order-2 md:order-1 flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
+                   <span>© 2026 Satyq Core. All rights reserved.</span>
+               </div>
+               <div className="order-1 md:order-2 flex flex-wrap justify-center items-center gap-3 md:gap-4 w-full md:w-auto pb-1 md:pb-0 border-b border-slate-200 dark:border-slate-800 md:border-none">
+                    <button className="hover:text-slate-800 dark:hover:text-slate-400 transition-colors uppercase whitespace-nowrap">Privacy Protocol</button>
+                    <button className="hover:text-slate-800 dark:hover:text-slate-400 transition-colors uppercase whitespace-nowrap">Terms of Access</button>
+                    <div className="flex items-center gap-2 pl-2 border-l border-slate-300 dark:border-slate-800">
+                       <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                       <span className="text-emerald-600/70 dark:text-emerald-500/50 whitespace-nowrap">SYSTEM_OPTIMAL</span>
+                    </div>
+                    <span className="text-slate-600 dark:text-slate-700">v4.2.0</span>
+               </div>
+           </div>
+
+         </div>
+       </div>
+     </main>
+
+     {/* Utilities */}
+     <TemplateManager 
+       isOpen={isTemplatesOpen} 
+       onClose={() => setIsTemplatesOpen(false)}
+       onSelectTemplate={(content) => {
+         setInputText(content);
+       }}
+     />
+
+     <DataVisualizer
+       isOpen={isVisualizerOpen}
+       onClose={() => setIsVisualizerOpen(false)}
+       onGenerate={(data, chartType) => {
+         // Switch to new dedicated Data Analysis mode
+         if (currentMode !== AppMode.DATA_ANALYSIS) {
+             setMessages([]); // Clear previous chat if switching
+             setCurrentMode(AppMode.DATA_ANALYSIS);
+         }
+         
+         const prompt = `[SYSTEM: DATA_VISUALIZATION_MODE]\n           User Preferred Visualization: ${chartType.toUpperCase()}\n           (If preference is AUTO, analyze data topology to select the best chart type).\n\n           Visualize the following telemetry data. \n\nDATA:\n${data}\n\nREQUIREMENT:\n1. Analyze the data.\n2. Output a JSON object following the visualization schema.\n3. Do NOT output conversational text outside the specified JSON block.`;
+         
+         handleSubmit(undefined, prompt, AppMode.DATA_ANALYSIS);
+       }}
+     />
+
+     <LogViewer 
+       message={selectedLogMessage} 
+       onClose={() => setSelectedLogMessage(null)} 
+     />
+
+     <ReportViewer 
+       message={selectedReportMessage} 
+       onClose={() => setSelectedReportMessage(null)} 
+     />
+
+     <DeleteConfirmDialog 
+       isOpen={!!messageToDelete}
+       onConfirm={handleConfirmDelete}
+       onCancel={() => setMessageToDelete(null)}
+     />
+
+     <ToastContainer 
+       toasts={toasts} 
+       onDismiss={removeToast} 
+     />
+
+   </div>
+ );
+}
