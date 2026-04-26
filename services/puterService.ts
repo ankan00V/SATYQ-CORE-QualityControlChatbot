@@ -57,7 +57,7 @@ export const generateResponse = async ({ prompt, history, imageBase64, mode, cou
   return { text: JSON.stringify(response) };
 };
 
-export async function streamResponseParts(params: GenerateParams) {
+export async function* streamResponseParts(params: GenerateParams): AsyncGenerator<any, void, unknown> {
   if (!(window as any).puter || !(window as any).puter.ai) {
     throw new Error('Puter not loaded');
   }
