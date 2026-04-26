@@ -1,6 +1,7 @@
 
+
 import React, { useState } from 'react';
-import { AppMode, ChatSession } from '../types';
+import { AppMode, ChatSession } from './types';
 import { Logo } from './Logo';
 import { 
   LayoutDashboard, 
@@ -80,7 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex items-center gap-2">
             <button 
                 onClick={onNewSession}
-                className="p-1.5 bg-cyan-100 dark:bg-cyan-900/20 hover:bg-cyan-200 dark:hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-500/30 rounded-md transition-all opacity-50 group-hover:opacity-100"
+                className="p-1.5 bg-cyan-100 dark:bg-cyan-900/20 hover:bg-cyan-200 dark:hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-500/30 rounded[...]
                 title="New Operation"
             >
                 <Plus className="w-4 h-4" />
@@ -122,7 +123,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }`}
                 >
                 <div className="flex items-center gap-3">
-                    <mode.icon className={`w-4 h-4 ${isActive ? `text-${color}-600 dark:text-${color}-400` : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'}`} />
+                    <mode.icon className={`w-4 h-4 ${isActive ? `text-${color}-600 dark:text-${color}-400` : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-s[...]
                     <span className="text-sm font-medium">{modeConfig.title}</span>
                 </div>
                 {isActive && <ChevronRight className={`w-3 h-3 text-${color}-500`} />}
@@ -139,7 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onOpenTemplates();
                 if (onClose) onClose();
             }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-colors group"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white[...]
           >
             <FileText className="w-4 h-4 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors" />
             <span className="text-sm font-medium">Report Templates</span>
@@ -149,7 +150,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onOpenVisualizer();
                 if (onClose) onClose();
             }}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white transition-colors group"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white[...]
           >
             <BarChart3 className="w-4 h-4 group-hover:text-fuchsia-500 dark:group-hover:text-fuchsia-400 transition-colors" />
             <span className="text-sm font-medium">Data Visualizer</span>
@@ -167,14 +168,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {sessions.map((session) => (
                         <div 
                             key={session.id}
-                            className="group relative w-full flex flex-col items-start px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-white/5"
+                            className="group relative w-full flex flex-col items-start px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer border border[...]
                             onClick={() => {
                                 onLoadSession(session);
                                 if (onClose) onClose();
                             }}
                         >
                             <div className="w-full flex justify-between items-start mb-1">
-                                <span className="text-xs font-medium text-slate-600 dark:text-slate-300 truncate pr-2 max-w-[140px] group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+                                <span className="text-xs font-medium text-slate-600 dark:text-slate-300 truncate pr-2 max-w-[140px] group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transi[...]
                                     {session.title}
                                 </span>
                                 <button 
