@@ -1,4 +1,4 @@
-import { AppMode, ChartConfig, GroundingSource, Message } from './types';
+import { AppMode, ChartConfig, GroundingSource, Message } from '../types';
 
 interface GenerateParams {
   prompt: string;
