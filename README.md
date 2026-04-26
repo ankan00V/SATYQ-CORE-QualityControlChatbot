@@ -13,7 +13,7 @@
 
 **Intelligent Quality. Absolute Truth.**
 
-👉 Live Demo: https://satyq-core-535261912619.us-west1.run.app
+👉 Live Demo: https://satyq-core-quality-control-chatbot.vercel.app
 
 ![SYSTEM](https://img.shields.io/badge/SYSTEM-OPTIMAL-emerald)
 ![AI](https://img.shields.io/badge/AI_BACKEND-PUTER.JS_v2-cyan)
