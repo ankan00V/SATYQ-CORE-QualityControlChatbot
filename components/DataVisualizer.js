@@ -1,4 +1,2 @@
-import React from 'react';
-
-export const DataVisualizer = (props) => React.createElement('div', Object.assign({}, props), null);
-export default DataVisualizer;
+export * from './index';
+export { default } from './index';

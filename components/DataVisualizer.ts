@@ -1,2 +1,2 @@
-export * from '../DataVisualizer';
-export { default } from '../DataVisualizer';
+export * from './index';
+export { default } from './index';

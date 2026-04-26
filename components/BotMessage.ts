@@ -1,2 +1,2 @@
-export * from '../BotMessage';
-export { default } from '../BotMessage';
+export * from './index';
+export { default } from './index';

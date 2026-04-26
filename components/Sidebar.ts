@@ -1,2 +1,2 @@
-export * from '../Sidebar';
-export { default } from '../Sidebar';
+export * from './index';
+export { default } from './index';

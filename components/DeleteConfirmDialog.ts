@@ -1,2 +1,2 @@
-export * from '../DeleteConfirmDialog';
-export { default } from '../DeleteConfirmDialog';
+export * from './index';
+export { default } from './index';

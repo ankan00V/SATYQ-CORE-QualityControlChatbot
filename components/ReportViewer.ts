@@ -1,2 +1,2 @@
-export * from '../ReportViewer';
-export { default } from '../ReportViewer';
+export * from './index';
+export { default } from './index';

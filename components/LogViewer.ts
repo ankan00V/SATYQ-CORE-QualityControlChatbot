@@ -1,2 +1,2 @@
-export * from '../LogViewer';
-export { default } from '../LogViewer';
+export * from './index';
+export { default } from './index';

@@ -1,2 +1,2 @@
-export * from '../TourGuide';
-export { default } from '../TourGuide';
+export * from './index';
+export { default } from './index';

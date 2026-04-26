@@ -1,2 +1,2 @@
-export * from '../TemplateManager';
-export { default } from '../TemplateManager';
+export * from './index';
+export { default } from './index';

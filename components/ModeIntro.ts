@@ -1,2 +1,2 @@
-export * from '../ModeIntro';
-export { default } from '../ModeIntro';
+export * from './index';
+export { default } from './index';
